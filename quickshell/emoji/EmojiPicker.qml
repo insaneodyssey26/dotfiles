@@ -89,14 +89,14 @@ PanelWindow {
     readonly property var filteredEmojis: {
         let q = root.query.trim().toLowerCase()
         if (!q) {
-            return root.allEmojis.slice(0, 60)
+            return root.allEmojis
         }
         let matches = []
         for (let i = 0; i < root.allEmojis.length; i++) {
             let item = root.allEmojis[i]
             if (item.name.toLowerCase().includes(q) || item.emoji.includes(q)) {
                 matches.push(item)
-                if (matches.length >= 60) break
+                if (matches.length >= 100) break
             }
         }
         return matches
@@ -163,7 +163,7 @@ PanelWindow {
     Rectangle {
         id: emojiCard
         width: 540
-        height: Math.min(490, Math.max(90, 72 + root.filteredEmojis.length * 48))
+        height: 480
         anchors.centerIn: parent
         radius: 16
         color: "#000000"
@@ -178,9 +178,6 @@ PanelWindow {
         }
         Behavior on opacity {
             NumberAnimation { duration: 180 }
-        }
-        Behavior on height {
-            NumberAnimation { duration: 200; easing.type: Easing.OutQuint }
         }
 
         ColumnLayout {
@@ -276,6 +273,7 @@ PanelWindow {
                 clip: true
                 spacing: 2
                 boundsBehavior: Flickable.StopAtBounds
+                reuseItems: true
                 model: root.filteredEmojis
 
                 delegate: Rectangle {
@@ -296,9 +294,6 @@ PanelWindow {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onPositionChanged: {
-                            root.selectedIndex = index
-                        }
                         onClicked: {
                             root.selectedIndex = index
                             root.copyItem(modelData)
