@@ -26,6 +26,7 @@ binds {
     Break allow-when-locked=true { spawn "niri" "msg" "action" "power-off-monitors"; }
     Mod+Pause { power-off-monitors; }
     Mod+Escape { spawn "quickshell" "ipc" "-p" "/home/masum/dotfiles/quickshell/shell.qml" "call" "session" "toggle"; }
+    Mod+Shift+Escape { spawn "/home/masum/dotfiles/scripts/toggle_quickshell.sh"; }
 
     // Column & Window Navigation (Horizontal ribbon + vertical stacking)
     Mod+Left  { focus-column-left; }
@@ -97,6 +98,14 @@ binds {
     XF86AudioLowerVolume allow-when-locked=true { spawn "bash" "-c" "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && quickshell ipc -p /home/masum/dotfiles/quickshell/shell.qml call osd volume"; }
     XF86AudioMute        allow-when-locked=true { spawn "bash" "-c" "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle && quickshell ipc -p /home/masum/dotfiles/quickshell/shell.qml call osd volume"; }
     XF86AudioMicMute     allow-when-locked=true { spawn "bash" "-c" "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && quickshell ipc -p /home/masum/dotfiles/quickshell/shell.qml call osd mic"; }
+    XF86AudioPlay        allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    XF86AudioPause       allow-when-locked=true { spawn "playerctl" "pause"; }
+    XF86AudioNext        allow-when-locked=true { spawn "playerctl" "next"; }
+    XF86AudioPrev        allow-when-locked=true { spawn "playerctl" "previous"; }
+    F7                   allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    Mod+F7               allow-when-locked=true { spawn "playerctl" "next"; }
+    Mod+Shift+F7         allow-when-locked=true { spawn "playerctl" "previous"; }
+    Mod+Slash            allow-when-locked=true { spawn "playerctl" "play-pause"; }
     XF86MonBrightnessUp   allow-when-locked=true { spawn "bash" "-c" "brightnessctl set 5%+ && quickshell ipc -p /home/masum/dotfiles/quickshell/shell.qml call osd brightness"; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "bash" "-c" "brightnessctl set 5%- && quickshell ipc -p /home/masum/dotfiles/quickshell/shell.qml call osd brightness"; }
 

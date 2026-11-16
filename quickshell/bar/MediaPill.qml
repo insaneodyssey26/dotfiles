@@ -157,6 +157,15 @@ Item {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: PopupManager.openPopup("media")
+                onWheel: (wheel) => {
+                    if (wheel.angleDelta.y > 0) {
+                        mediaCmdProc.command = ["playerctl", "next"]
+                        mediaCmdProc.running = true
+                    } else if (wheel.angleDelta.y < 0) {
+                        mediaCmdProc.command = ["playerctl", "previous"]
+                        mediaCmdProc.running = true
+                    }
+                }
             }
         }
 
@@ -190,6 +199,15 @@ Item {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: PopupManager.openPopup("media")
+                onWheel: (wheel) => {
+                    if (wheel.angleDelta.y > 0) {
+                        mediaCmdProc.command = ["playerctl", "next"]
+                        mediaCmdProc.running = true
+                    } else if (wheel.angleDelta.y < 0) {
+                        mediaCmdProc.command = ["playerctl", "previous"]
+                        mediaCmdProc.running = true
+                    }
+                }
             }
         }
     }

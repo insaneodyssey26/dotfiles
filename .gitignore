@@ -1,1 +1,7 @@
 .vscode/
+quickshell/theme/Colors.qml
+niri/colors.kdl
+kitty/colors.conf
+fish/colors.fish
+foot/colors.ini
+gtk-3.0/colors.css
