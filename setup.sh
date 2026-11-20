@@ -72,13 +72,13 @@ else
     info "AUR helper (paru) is already installed."
 fi
 
-OFFICIAL_PKGS="niri hypridle hyprlock kitty foot zsh zsh-autosuggestions zsh-syntax-highlighting eza bat fzf fd ripgrep zoxide yazi nautilus loupe mpv btop asciiquarium cava gnome-calculator rnote satty fastfetch starship awww xdg-desktop-portal-gnome xdg-desktop-portal-gtk polkit-kde-agent playerctl cliphist wl-clipboard xdg-user-dirs bluez bluez-utils networkmanager pipewire pipewire-pulse pipewire-alsa wireplumber pavucontrol qt5-wayland qt6-wayland brightnessctl noto-fonts noto-fonts-emoji ttf-nerd-fonts-symbols unzip zip power-profiles-daemon asusctl rog-control-center zram-generator pacman-contrib"
+OFFICIAL_PKGS="niri hypridle hyprlock kitty foot zsh zsh-autosuggestions zsh-syntax-highlighting eza bat fzf fd ripgrep zoxide yazi nautilus loupe mpv btop asciiquarium cava gnome-calculator rnote satty fastfetch starship awww xdg-desktop-portal-gnome xdg-desktop-portal-gtk polkit-kde-agent playerctl cliphist wl-clipboard xdg-user-dirs bluez bluez-utils networkmanager pipewire pipewire-pulse pipewire-alsa wireplumber pavucontrol qt5-wayland qt6-wayland brightnessctl noto-fonts noto-fonts-emoji ttf-nerd-fonts-symbols unzip zip power-profiles-daemon asusctl rog-control-center zram-generator pacman-contrib whisper-cpp wtype libpulse"
 AUR_PKGS="quickshell-git matugen-bin nautilus-open-any-terminal otf-geist maplemono-nf-unhinted wvkbd tty-clock"
 
 # Detect NVIDIA GPU and append appropriate drivers
 if lspci | grep -iE 'vga|3d' | grep -iq nvidia; then
     info "NVIDIA GPU detected. Adding driver packages..."
-    OFFICIAL_PKGS="$OFFICIAL_PKGS nvidia-open-dkms nvidia-utils nvidia-prime libva-nvidia-driver egl-wayland"
+    OFFICIAL_PKGS="$OFFICIAL_PKGS nvidia-open-dkms nvidia-utils nvidia-prime libva-nvidia-driver egl-wayland ggml-vulkan"
 fi
 
 info "Installing official repository packages..."
@@ -86,6 +86,15 @@ sudo pacman -S --needed --noconfirm $OFFICIAL_PKGS
 
 info "Installing AUR packages..."
 paru -S --needed --noconfirm $AUR_PKGS
+
+# Voice dictation model
+WHISPER_MODEL="$HOME/.local/share/whisper-cpp/ggml-large-v3-turbo-q5_0.bin"
+if [ ! -f "$WHISPER_MODEL" ]; then
+    info "Downloading voice dictation model (about 550 MB)..."
+    mkdir -p "$(dirname "$WHISPER_MODEL")"
+    curl -L -C - -o "$WHISPER_MODEL" "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_0.bin" \
+        || info "Model download failed. Voice dictation will not work until it is downloaded."
+fi
 
 # 5. Configuration Deployment (Symlinking)
 info "Deploying configurations..."
