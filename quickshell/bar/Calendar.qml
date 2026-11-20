@@ -2,14 +2,10 @@ import QtQuick
 import QtQuick.Layouts
 import "../theme"
 
-Rectangle {
+Item {
     id: root
     implicitWidth: 320
     implicitHeight: 330
-    radius: 18
-    color: "#000000"
-    border.color: "transparent"
-    border.width: 0
 
     property date viewingDate: new Date()
     property date today: new Date()

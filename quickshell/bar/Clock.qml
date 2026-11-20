@@ -206,129 +206,30 @@ Item {
         }
     }
 
-    // Native Calendar Popup (Triggered by Date)
-    PopupWindow {
+    BarPopup {
         id: calPopup
-        anchor {
-            item: root
-            edges: Edges.Bottom
-            gravity: Edges.Bottom
-            margins.top: 8
-        }
-        implicitWidth: 320
-        implicitHeight: 330
-        visible: PopupManager.isPopupOpen("calendar")
-        grabFocus: true
-        onVisibleChanged: {
-            if (!visible && PopupManager.activePopup === "calendar") {
-                PopupManager.closeAll()
-            }
-        }
-        color: "transparent"
+        name: "calendar"
+        target: root
+        bodyWidth: 320
+        bodyHeight: 330
 
-        Item {
-            id: animContainer
+        Calendar {
             anchors.fill: parent
-            scale: 0.92
-            opacity: 0.0
-
-            Calendar {
-                anchors.fill: parent
-            }
-
-            states: [
-                State {
-                    name: "visible"
-                    when: calPopup.visible
-                    PropertyChanges { target: animContainer; scale: 1.0; opacity: 1.0 }
-                },
-                State {
-                    name: "hidden"
-                    when: !calPopup.visible
-                    PropertyChanges { target: animContainer; scale: 0.92; opacity: 0.0 }
-                }
-            ]
-
-            transitions: [
-                Transition {
-                    from: "hidden"; to: "visible"
-                    ParallelAnimation {
-                        NumberAnimation { property: "scale"; duration: 220; easing.type: Easing.OutBack; easing.overshoot: 1.1 }
-                        NumberAnimation { property: "opacity"; duration: 180; easing.type: Easing.OutCubic }
-                    }
-                },
-                Transition {
-                    from: "visible"; to: "hidden"
-                    ParallelAnimation {
-                        NumberAnimation { property: "scale"; duration: 160; easing.type: Easing.InCubic }
-                        NumberAnimation { property: "opacity"; duration: 150; easing.type: Easing.InCubic }
-                    }
-                }
-            ]
         }
     }
 
-    // Native Timer & Stopwatch Popup (Triggered by Clock)
-    PopupWindow {
+    BarPopup {
         id: timerPopup
-        anchor {
-            item: root
-            edges: Edges.Bottom
-            gravity: Edges.Bottom
-            margins.top: 8
-        }
-        implicitWidth: 340
-        implicitHeight: TimerService.isActive ? 420 : 340
-        visible: PopupManager.isPopupOpen("timer")
-        grabFocus: true
-        onVisibleChanged: {
-            if (!visible && PopupManager.activePopup === "timer") {
-                PopupManager.closeAll()
-            }
-        }
-        color: "transparent"
+        name: "timer"
+        target: root
+        bodyWidth: 340
+        bodyHeight: timerCard.implicitHeight
+        takesKeyboard: true
+        onOpened: timerCard.syncTab()
 
-        Behavior on implicitHeight { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-
-        Item {
-            id: timerAnimContainer
+        TimerCard {
+            id: timerCard
             anchors.fill: parent
-            scale: 0.92
-            opacity: 0.0
-
-            TimerCard {
-                anchors.fill: parent
-            }
-
-            states: [
-                State {
-                    name: "visible"
-                    when: timerPopup.visible
-                    PropertyChanges { target: timerAnimContainer; scale: 1.0; opacity: 1.0 }
-                },
-                State {
-                    name: "hidden"
-                    when: !timerPopup.visible
-                    PropertyChanges { target: timerAnimContainer; scale: 0.92; opacity: 0.0 }
-                }
-            ]
-
-            transitions: [
-                Transition {
-                    from: "hidden"; to: "visible"
-                    ParallelAnimation {
-                        NumberAnimation { property: "scale"; duration: 220; easing.type: Easing.OutBack; easing.overshoot: 1.1 }
-                        NumberAnimation { property: "opacity"; duration: 180; easing.type: Easing.OutCubic }
-                    }
-                },
-                Transition {
-                    from: "visible"; to: "hidden"
-                    ParallelAnimation {
-                        NumberAnimation { property: "scale"; duration: 160; easing.type: Easing.InCubic }
-                        NumberAnimation { property: "opacity"; duration: 150; easing.type: Easing.InCubic }
-                    }
-                }
-            ]
         }
     }
 }
