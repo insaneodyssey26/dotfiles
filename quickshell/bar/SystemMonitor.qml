@@ -25,8 +25,10 @@ QtObject {
     property real gpuMemPct: 0.0
     property string gpuName: "GeForce RTX 4050"
 
-    // Fan speed
-    property int fanRpm: 0
+    property real gpuPower: 0.0
+
+    property int cpuFanRpm: 0
+    property int gpuFanRpm: 0
 
     // Local IP address
     property string localIp: "127.0.0.1"
@@ -34,7 +36,9 @@ QtObject {
     // Store previous CPU tick counters
     property var lastCpuTicks: null
 
-    // Lightweight sampling of kernel virtual files every 2s
+    property int tick: 0
+
+    // Lightweight sampling of kernel virtual files every 2s, temperature every 6s
     property Timer timer: Timer {
         interval: 2000
         running: true
@@ -43,7 +47,8 @@ QtObject {
         onTriggered: {
             statFile.reload()
             memFile.reload()
-            tempFile.reload()
+            if (monitor.tick % 3 === 0) tempFile.reload()
+            monitor.tick++
 
             // Heavy subprocesses only sampled when popup is active or on first start
             if (PopupManager.isPopupOpen("cpu") || monitor.uptimeStr === "up 0m") {
@@ -97,6 +102,17 @@ QtObject {
         }
     }
 
+    property Process tempSensorProcess: Process {
+        command: ["bash", "-c", "for h in /sys/class/hwmon/hwmon*; do [ \"$(cat $h/name)\" = k10temp ] && echo $h/temp1_input && break; done"]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const path = text.trim()
+                if (path.length > 0) monitor.tempFile.path = path
+            }
+        }
+    }
+
     property FileView tempFile: FileView {
         path: "/sys/class/thermal/thermal_zone0/temp"
         onLoaded: {
@@ -142,6 +158,7 @@ QtObject {
                     let totalMb = parseFloat(parts[3]) || 6141
                     monitor.gpuMemPct = Math.round((usedMb / totalMb) * 100)
                     monitor.gpuMemStr = (usedMb / 1024).toFixed(1) + "G / " + (totalMb / 1024).toFixed(1) + "G"
+                    monitor.gpuPower = parseFloat(parts[4]) || 0
                 }
             }
         }
@@ -151,7 +168,9 @@ QtObject {
         command: ["/home/masum/dotfiles/quickshell/scripts/fan-stats.sh"]
         stdout: StdioCollector {
             onStreamFinished: {
-                monitor.fanRpm = parseInt(text.trim()) || 0
+                const speeds = text.trim().split(/\s+/)
+                monitor.cpuFanRpm = parseInt(speeds[0]) || 0
+                monitor.gpuFanRpm = parseInt(speeds[1]) || 0
             }
         }
     }
