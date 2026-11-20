@@ -116,7 +116,7 @@ binds {
     Mod+V       { spawn "quickshell" "ipc" "-p" "/home/masum/dotfiles/quickshell/shell.qml" "call" "clipboard" "toggle"; }
     Mod+X       { spawn "quickshell" "ipc" "-p" "/home/masum/dotfiles/quickshell/shell.qml" "call" "tasks" "toggle"; }
     Mod+P       { spawn "quickshell" "ipc" "-p" "/home/masum/dotfiles/quickshell/shell.qml" "call" "projects" "toggle"; }
-    Mod+K       { spawn "/home/masum/dotfiles/scripts/toggle_osk.sh"; }
+    Mod+K       { spawn "/home/masum/dotfiles/quickshell/scripts/toggle-keyboard.sh"; }
     Mod+Period  { spawn "quickshell" "ipc" "-p" "/home/masum/dotfiles/quickshell/shell.qml" "call" "emoji" "toggle"; }
     Mod+N       { spawn "quickshell" "ipc" "-p" "/home/masum/dotfiles/quickshell/shell.qml" "call" "notifications" "toggle"; }
     Mod+S       { spawn "quickshell" "ipc" "-p" "/home/masum/dotfiles/quickshell/shell.qml" "call" "controls" "toggle"; }
