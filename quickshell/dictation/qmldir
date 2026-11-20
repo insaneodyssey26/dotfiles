@@ -1,0 +1,3 @@
+module quickshell.dictation
+DictationNotch 1.0 DictationNotch.qml
+DictationVisualizer 1.0 DictationVisualizer.qml

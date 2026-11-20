@@ -20,6 +20,7 @@ import "finder"
 import "osd"
 import "overlay"
 import "services"
+import "dictation"
 
 ShellRoot {
     id: root
@@ -349,6 +350,23 @@ IpcHandler {
 
     FreezeOverlay {
         id: freezeWindow
+    }
+
+    DictationNotch {
+        id: dictationNotch
+    }
+
+    IpcHandler {
+        target: "dictation"
+        function toggle() {
+            dictationNotch.toggle()
+        }
+        function open() {
+            dictationNotch.start()
+        }
+        function close() {
+            dictationNotch.stop()
+        }
     }
 
 IpcHandler {

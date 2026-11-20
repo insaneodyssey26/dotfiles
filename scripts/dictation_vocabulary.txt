@@ -1,0 +1,50 @@
+Niri
+Quickshell
+Kotlin
+Claude Code
+Claude
+Anthropic
+Hyprland
+Hyprlock
+Hypridle
+Wayland
+Matugen
+PipeWire
+WirePlumber
+Gradle
+JetBrains
+IntelliJ
+Android Studio
+TypeScript
+Node.js
+pnpm
+GitHub
+GitLab
+VS Code
+Kubernetes
+Jaeger
+OpenTelemetry
+KDE Connect
+Kdenlive
+Krita
+Headlamp
+Devfolio
+whisper.cpp
+Codex
+WhatsApp
+NVIDIA
+Vulkan
+CUDA
+Ryzen
+RTX
+ASUS ROG
+QML
+Zen Browser
+Neovim
+Yazi
+Zsh
+systemd
+Arch Linux
+Xwayland
+CMake
+OBS Studio
