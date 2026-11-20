@@ -43,7 +43,7 @@ ShellRoot {
                 color: "transparent"
 
                 WlrLayershell.layer: WlrLayer.Top
-                WlrLayershell.keyboardFocus: (PopupManager.activePopup === "timer") ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+                WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
                 WlrLayershell.namespace: "aether-bar"
                 WlrLayershell.exclusionMode: ExclusionMode.Normal
                 WlrLayershell.exclusiveZone: 38
@@ -354,6 +354,16 @@ IpcHandler {
 
     DictationNotch {
         id: dictationNotch
+    }
+
+    IpcHandler {
+        target: "popup"
+        function toggle(name: string) {
+            PopupManager.openPopup(name)
+        }
+        function close() {
+            PopupManager.closeAll()
+        }
     }
 
     IpcHandler {

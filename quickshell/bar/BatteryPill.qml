@@ -115,242 +115,184 @@ Rectangle {
         }
     }
 
-    PopupWindow {
+    BarPopup {
         id: batPopup
-        anchor {
-            item: root
-            edges: Edges.Bottom
-            gravity: Edges.Bottom
-            margins.top: 8
-        }
-        implicitWidth: 300
-        implicitHeight: mainBatCol.implicitHeight + 32
-        visible: PopupManager.isPopupOpen("battery")
-        grabFocus: true
-        onVisibleChanged: {
-            if (!visible && PopupManager.activePopup === "battery") {
-                PopupManager.closeAll()
-            } else if (visible) {
-                brightFile.reload()
-            }
-        }
-        color: "transparent"
+        name: "battery"
+        target: root
+        bodyWidth: 300
+        bodyHeight: mainBatCol.implicitHeight + 32
+        onOpened: brightFile.reload()
 
-        Item {
-            id: batAnimContainer
+        ColumnLayout {
+            id: mainBatCol
             anchors.fill: parent
-            scale: 0.92
-            opacity: 0.0
+            anchors.margins: 16
+            spacing: 12
+
+            RowLayout {
+                Layout.fillWidth: true
+                Text {
+                    text: "Battery Status"
+                    font.family: "Geist"
+                    font.pixelSize: 14
+                    font.bold: true
+                    color: Colors.colText
+                }
+                Item { Layout.fillWidth: true }
+                Text {
+                    text: Math.round(root.pct) + "%"
+                    font.family: "Geist"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: Colors.colPrimary
+                }
+            }
 
             Rectangle {
-                anchors.fill: parent
-                radius: 18
-                color: "#000000"
-                border.color: "transparent"
-                border.width: 0
+                Layout.fillWidth: true
+                Layout.preferredHeight: 12
+                radius: 6
+                color: Qt.rgba(1, 1, 1, 0.1)
 
-                ColumnLayout {
-                    id: mainBatCol
+                Rectangle {
+                    height: parent.height
+                    radius: 6
+                    color: root.pct < 20 ? Colors.colError : Colors.colPrimary
+                    width: (root.pct / 100) * parent.width
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 36
+                radius: 8
+                color: Qt.rgba(1, 1, 1, 0.08)
+
+                RowLayout {
+                    anchors.centerIn: parent
+                    spacing: 8
+                    Text {
+                        text: root.charging ? "󱐋" : "󰁹"
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 15
+                        color: Colors.colPrimary
+                    }
+                    Text {
+                        text: root.charging ? "Charging AC connected" : "Discharging on battery"
+                        font.family: "Geist"
+                        font.pixelSize: 12
+                        font.bold: true
+                        color: Colors.colText
+                    }
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 1
+                color: Qt.rgba(1, 1, 1, 0.08)
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 24
+                Layout.leftMargin: 4
+                Layout.rightMargin: 4
+                spacing: 8
+
+                Text {
+                    text: root.brightnessVal > 60 ? "󰃠" : (root.brightnessVal > 30 ? "󰃟" : "󰃞")
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 15
+                    color: Colors.colPrimary
+                    Layout.alignment: Qt.AlignVCenter
+                }
+
+                Text {
+                    text: "Screen Brightness"
+                    font.family: "Geist"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: Colors.colText
+                    Layout.alignment: Qt.AlignVCenter
+                }
+
+                Item { Layout.fillWidth: true }
+
+                Text {
+                    text: Math.round(root.brightnessVal) + "%"
+                    font.family: "Geist"
+                    font.pixelSize: 12
+                    font.bold: true
+                    color: Colors.colPrimary
+                    Layout.alignment: Qt.AlignVCenter
+                }
+            }
+
+            Rectangle {
+                id: brightTrack
+                Layout.fillWidth: true
+                Layout.preferredHeight: 18
+                radius: 9
+                color: Qt.rgba(1, 1, 1, 0.08)
+
+                Rectangle {
+                    height: parent.height
+                    radius: 9
+                    color: Colors.colPrimary
+                    width: Math.min(brightTrack.width, Math.max(0, (root.brightnessVal / 100) * brightTrack.width))
+                }
+
+                Rectangle {
+                    width: 14
+                    height: 14
+                    radius: 7
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: Math.max(0, Math.min(brightTrack.width - 14, (root.brightnessVal / 100) * brightTrack.width - 7))
+                    color: "#ffffff"
+                }
+
+                MouseArea {
                     anchors.fill: parent
-                    anchors.margins: 16
-                    spacing: 12
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text {
-                            text: "Battery Status"
-                            font.family: "Geist"
-                            font.pixelSize: 14
-                            font.bold: true
-                            color: Colors.colText
-                        }
-                        Item { Layout.fillWidth: true }
-                        Text {
-                            text: Math.round(root.pct) + "%"
-                            font.family: "Geist"
-                            font.pixelSize: 13
-                            font.bold: true
-                            color: Colors.colPrimary
-                        }
+                    cursorShape: Qt.PointingHandCursor
+                    preventStealing: true
+                    onClicked: (mouse) => {
+                        let ratio = Math.max(0.01, Math.min(1, mouse.x / brightTrack.width))
+                        root.setBrightnessPercent(ratio * 100)
                     }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 12
-                        radius: 6
-                        color: Qt.rgba(1, 1, 1, 0.1)
-
-                        Rectangle {
-                            height: parent.height
-                            radius: 6
-                            color: root.pct < 20 ? Colors.colError : Colors.colPrimary
-                            width: (root.pct / 100) * parent.width
-                        }
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 36
-                        radius: 8
-                        color: Qt.rgba(1, 1, 1, 0.08)
-
-                        RowLayout {
-                            anchors.centerIn: parent
-                            spacing: 8
-                            Text {
-                                text: root.charging ? "󱐋" : "󰁹"
-                                font.family: "Symbols Nerd Font"
-                                font.pixelSize: 15
-                                color: Colors.colPrimary
-                            }
-                            Text {
-                                text: root.charging ? "Charging AC connected" : "Discharging on battery"
-                                font.family: "Geist"
-                                font.pixelSize: 12
-                                font.bold: true
-                                color: Colors.colText
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 1
-                        color: Qt.rgba(1, 1, 1, 0.08)
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 24
-                        Layout.leftMargin: 4
-                        Layout.rightMargin: 4
-                        spacing: 8
-
-                        Text {
-                            text: root.brightnessVal > 60 ? "󰃠" : (root.brightnessVal > 30 ? "󰃟" : "󰃞")
-                            font.family: "Symbols Nerd Font"
-                            font.pixelSize: 15
-                            color: Colors.colPrimary
-                            Layout.alignment: Qt.AlignVCenter
-                        }
-
-                        Text {
-                            text: "Screen Brightness"
-                            font.family: "Geist"
-                            font.pixelSize: 13
-                            font.bold: true
-                            color: Colors.colText
-                            Layout.alignment: Qt.AlignVCenter
-                        }
-
-                        Item { Layout.fillWidth: true }
-
-                        Text {
-                            text: Math.round(root.brightnessVal) + "%"
-                            font.family: "Geist"
-                            font.pixelSize: 12
-                            font.bold: true
-                            color: Colors.colPrimary
-                            Layout.alignment: Qt.AlignVCenter
-                        }
-                    }
-
-                    Rectangle {
-                        id: brightTrack
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 18
-                        radius: 9
-                        color: Qt.rgba(1, 1, 1, 0.08)
-
-                        Rectangle {
-                            height: parent.height
-                            radius: 9
-                            color: Colors.colPrimary
-                            width: Math.min(brightTrack.width, Math.max(0, (root.brightnessVal / 100) * brightTrack.width))
-                        }
-
-                        Rectangle {
-                            width: 14
-                            height: 14
-                            radius: 7
-                            anchors.verticalCenter: parent.verticalCenter
-                            x: Math.max(0, Math.min(brightTrack.width - 14, (root.brightnessVal / 100) * brightTrack.width - 7))
-                            color: "#ffffff"
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            preventStealing: true
-                            onClicked: (mouse) => {
-                                let ratio = Math.max(0.01, Math.min(1, mouse.x / brightTrack.width))
-                                root.setBrightnessPercent(ratio * 100)
-                            }
-                            onPositionChanged: (mouse) => {
-                                if (pressed) {
-                                    let ratio = Math.max(0.01, Math.min(1, mouse.x / brightTrack.width))
-                                    root.setBrightnessPercent(ratio * 100)
-                                }
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 32
-                        radius: 8
-                        color: rogHover.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(1, 1, 1, 0.08)
-
-                        RowLayout {
-                            anchors.centerIn: parent
-                            spacing: 6
-                            Text { text: "󰌢"; font.family: "Symbols Nerd Font"; font.pixelSize: 13; color: Colors.colPrimary }
-                            Text { text: "ROG Control Center"; font.family: "Geist"; font.pixelSize: 12; font.bold: true; color: Colors.colText }
-                        }
-
-                        MouseArea {
-                            id: rogHover
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                rogProc.running = true
-                                PopupManager.closeAll()
-                            }
+                    onPositionChanged: (mouse) => {
+                        if (pressed) {
+                            let ratio = Math.max(0.01, Math.min(1, mouse.x / brightTrack.width))
+                            root.setBrightnessPercent(ratio * 100)
                         }
                     }
                 }
             }
 
-            states: [
-                State {
-                    name: "visible"
-                    when: batPopup.visible
-                    PropertyChanges { target: batAnimContainer; scale: 1.0; opacity: 1.0 }
-                },
-                State {
-                    name: "hidden"
-                    when: !batPopup.visible
-                    PropertyChanges { target: batAnimContainer; scale: 0.92; opacity: 0.0 }
-                }
-            ]
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 32
+                radius: 8
+                color: rogHover.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(1, 1, 1, 0.08)
 
-            transitions: [
-                Transition {
-                    from: "hidden"; to: "visible"
-                    ParallelAnimation {
-                        NumberAnimation { property: "scale"; duration: 220; easing.type: Easing.OutBack; easing.overshoot: 1.1 }
-                        NumberAnimation { property: "opacity"; duration: 180; easing.type: Easing.OutCubic }
-                    }
-                },
-                Transition {
-                    from: "visible"; to: "hidden"
-                    ParallelAnimation {
-                        NumberAnimation { property: "scale"; duration: 160; easing.type: Easing.InCubic }
-                        NumberAnimation { property: "opacity"; duration: 150; easing.type: Easing.InCubic }
+                RowLayout {
+                    anchors.centerIn: parent
+                    spacing: 6
+                    Text { text: "󰌢"; font.family: "Symbols Nerd Font"; font.pixelSize: 13; color: Colors.colPrimary }
+                    Text { text: "ROG Control Center"; font.family: "Geist"; font.pixelSize: 12; font.bold: true; color: Colors.colText }
+                }
+
+                MouseArea {
+                    id: rogHover
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        rogProc.running = true
+                        PopupManager.closeAll()
                     }
                 }
-            ]
+            }
         }
     }
 }
