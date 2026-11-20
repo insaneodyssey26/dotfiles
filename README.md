@@ -8,9 +8,16 @@ My personal desktop setup on Arch Linux using the [Niri](https://github.com/YaLT
 ---
 
 > [!NOTE]
-> **Switched from Hyprland to Niri:**
-> I recently moved from Hyprland to Niri as my main window manager.
-> My full Hyprland setup (with Lua configs and custom stuff) is backed up on the **[`hyprland-archive`](https://github.com/insaneodyssey26/hyprland/tree/hyprland-archive)** branch. I won't be updating that branch anymore unless I ever go back. This `main` branch is now all about Niri.
+> **Branches**
+>
+> | Branch | What is in it |
+> | :--- | :--- |
+> | `main` | This branch. Niri and Quickshell, what I use now. |
+> | [`legacy-waybar`](https://github.com/insaneodyssey26/dotfiles/tree/legacy-waybar) | Niri with Waybar, SwayNC and Fuzzel, from before I moved to Quickshell. |
+> | [`hyprland-archive`](https://github.com/insaneodyssey26/dotfiles/tree/hyprland-archive) | My full Hyprland setup, with Lua configs. Not updated anymore. |
+> | [`experiment`](https://github.com/insaneodyssey26/dotfiles/tree/experiment) | Older Hyprland and Waybar tests. Not updated anymore. |
+>
+> I moved from Hyprland to Niri, and later from Waybar to Quickshell. Anything for those old setups is in the branches above, so it is not in `main`.
 
 ---
 
@@ -30,8 +37,9 @@ My personal desktop setup on Arch Linux using the [Niri](https://github.com/YaLT
 *   **Dynamic Colors**: Wallpaper colors extracted on the fly using Matugen.
 *   **Smooth Wallpapers**: Animated transitions using `awww`.
 *   **Dual Shells**: Synced aliases and shortcuts across Zsh and Fish.
-*   **Clean Wayland Suite**: Waybar for the top bar, SwayNC for notifications, and Fuzzel for the launcher.
-*   **Everyday Tools**: Native color picker, Satty screenshot editor, cliphist clipboard, and idle screen sleep.
+*   **Quickshell Desktop**: Custom top bar, launcher, notifications, clipboard, emoji picker and wallpaper picker. Bar popups attach to the bar.
+*   **Voice Dictation**: Press `Super + H`, talk, and the words are typed into the focused text box. Fully offline.
+*   **Everyday Tools**: Native color picker, Niri screenshots, cliphist clipboard, and idle screen sleep.
 
 ---
 
@@ -41,26 +49,43 @@ When you pick a wallpaper, colors update and reload across open apps:
 
 ```mermaid
 graph TD
-    A[Pick Wallpaper / fuzzel] --> B[theme.sh script]
+    A[Pick Wallpaper / Super + W] --> B[theme.sh script]
     B --> C[awww: Animated transition]
     B --> D[matugen: Generate palette]
     D --> E[Update config files]
     D --> F[Reload apps]
-    
-    E --> E1[Waybar: colors.css]
+
+    E --> E1[Quickshell: Colors.qml]
     E --> E2[Niri: colors.kdl]
     E --> E3[Hyprlock: colors.conf]
     E --> E4[Kitty: colors.conf]
-    E --> E5[SwayNC: colors.css]
-    E --> E6[Fuzzel: fuzzel.ini]
-    E --> E7[Fish & Zsh: Colors]
-    E --> E8[Foot: colors.ini]
-    E --> E9[Cava: Theme]
-    
-    F --> F1[Reload Waybar]
-    F --> F2[Reload SwayNC]
-    F --> F3[Reload Kitty]
+    E --> E5[Fish & Zsh: Colors]
+    E --> E6[Foot: colors.ini]
+    E --> E7[Cava: Theme]
+    E --> E8[GTK: colors.css]
+
+    F --> F1[Quickshell: reloads on change]
+    F --> F2[Kitty: reload colors]
 ```
+
+---
+
+## What Is In This Branch
+
+| Folder | What it is |
+| :--- | :--- |
+| `niri/` | Window manager config, keybinds and window rules. |
+| `quickshell/` | The shell: top bar, popups, launcher, notifications, pickers. |
+| `scripts/` | Helper scripts: theme, lock, wallpaper, voice dictation. |
+| `matugen/` | Color templates generated from the wallpaper. |
+| `hypridle/`, `hyprlock/` | Idle timeouts and the lock screen. |
+| `kitty/`, `foot/`, `fish/`, `.zshrc` | Terminals and shells. |
+| `cava/`, `mpv/`, `fastfetch/` | Visualizer, video player and system info. |
+| `limine/`, `udev/`, `reflector/` | Boot loader, device rules and mirror list. |
+| `Code/`, `zed/`, `gradle/` | Editor settings and Gradle config. |
+| `gtk-3.0/`, `gtk-4.0/`, `nautilus/` | GTK settings and a Nautilus extension. |
+| `wallpapers/`, `fonts/`, `icons/`, `assets/` | Images, fonts, cursor theme and screenshots. |
+| `setup.sh`, `apps.sh` | Install the system, and extra apps, on a fresh Arch install. |
 
 ---
 
@@ -69,17 +94,16 @@ graph TD
 | Part | Tool | Config Location | Notes |
 | :--- | :--- | :--- | :--- |
 | **Window Manager** | Niri | [niri/](niri/) | Scrollable tiling layout (`config.kdl`, `binds.kdl`, `rules.kdl`). |
-| **Top Bar** | Waybar | [waybar/](waybar/) | Top status bar themed with Matugen colors. |
-| **App Launcher** | Fuzzel | [fuzzel/](fuzzel/) | Minimal Wayland application launcher. |
-| **Notifications** | SwayNC | [swaync/](swaync/) | Notification center and quick controls. |
+| **Shell** | Quickshell | [quickshell/](quickshell/) | Top bar, launcher, notifications, clipboard, emoji, wallpaper picker and popups. |
+| **Voice Dictation** | whisper.cpp | [scripts/voice_dictation.py](scripts/voice_dictation.py) | Offline dictation, see [Voice Dictation](#voice-dictation). |
 | **Colors** | Matugen | [matugen/](matugen/) | Generates palettes from wallpapers. |
 | **Terminals** | Kitty & Foot | [kitty/](kitty/), [foot/](foot/) | Fast GPU terminals. |
 | **Shells** | Zsh & Fish | [.zshrc](.zshrc), [fish/](fish/) | Autosuggestions, syntax highlights, and shared aliases. |
 | **Prompt** | Starship | [starship.toml](starship.toml) | Clean prompt across both shells. |
 | **File Managers** | Nautilus & Yazi | System | Nautilus for GUI, Yazi for terminal. |
 | **Lock Screen** | Hyprlock | [hyprlock/](hyprlock/) | Minimal lockscreen matching wallpaper colors. |
-| **Idle Sleep** | Swayidle | [niri/config.kdl](niri/config.kdl) | Screen dimming and DPMS monitor sleep (no suspend freezes). |
-| **Screenshots** | Grim, Slurp, Satty | [scripts/screenshot.sh](scripts/screenshot.sh) | Silent full screen or crop area with Satty editor. |
+| **Idle Sleep** | Hypridle | [hypridle/](hypridle/) | Dims at 8 min, locks at 10, screen off at 12, suspends at 15. |
+| **Screenshots** | Niri | [niri/binds.kdl](niri/binds.kdl) | Built in. Saved to `~/Pictures/Screenshots/`. |
 | **Audio Visualizer** | Cava | [cava/](cava/) | Audio visualizer in terminal. |
 
 ---
@@ -98,7 +122,7 @@ graph TD
 | `SUPER + F` | Maximize column |
 | `SUPER + SHIFT + F` | Fullscreen window |
 | `SUPER + SPACE` | Toggle window floating |
-| `ALT + TAB` | Open visual workspace overview |
+| `ALT + TAB` or `SUPER + O` | Open visual workspace overview |
 | `SUPER + Q` | Close window |
 
 ### Apps
@@ -107,7 +131,7 @@ graph TD
 | :--- | :--- |
 | `SUPER + T` | Open Kitty terminal |
 | `SUPER + SHIFT + T` | Open Foot terminal |
-| `SUPER + D` | Open Fuzzel app menu |
+| `SUPER + D` | Open the app launcher |
 | `SUPER + G` | Search files |
 | `SUPER + B` | Open Brave browser |
 | `SUPER + SHIFT + B` | Open Brave without GPU compositing |
@@ -121,19 +145,38 @@ graph TD
 | Keys | What it does |
 | :--- | :--- |
 | `PRINT` | Fullscreen screenshot (saved silently to `~/Pictures/Screenshots/`) |
-| `SHIFT + PRINT` | Select region to screenshot, copy to clipboard, click notification to open in Satty |
+| `SHIFT + PRINT` | Select a region to screenshot |
 | `SUPER + V` | Open clipboard history |
 | `SUPER + X` | Open task killer menu |
 | `SUPER + P` | Open project switcher |
 | `SUPER + K` | Toggle on-screen keyboard |
 | `SUPER + N` | Toggle notification panel |
-| `SUPER + H` | Toggle Waybar show/hide |
-| `SUPER + S` | Open system power options in Fuzzel |
+| `SUPER + H` | Start or stop voice dictation |
+| `SUPER + .` | Open emoji picker |
+| `SUPER + S` | Open quick controls panel |
 | `SUPER + W` | Open wallpaper selector |
 | `SUPER + SHIFT + W` | Pick a random wallpaper |
 | `SUPER + Y` | Pick a color from screen and copy hex code |
 | `SUPER + L` | Lock screen |
 | `SUPER + Escape` | Power menu |
+| `SUPER + SHIFT + Escape` | Toggle Quickshell on or off |
+| `F7` | Play or pause media |
+| `SUPER + F7` / `SUPER + SHIFT + F7` | Next or previous track |
+
+---
+
+## Voice Dictation
+
+Press `SUPER + H`, talk, and the words are typed into whatever text box is focused. Press `SUPER + H` again, or click the pill, to stop. It finishes the last sentence first.
+
+*   **Offline**: Runs on [whisper.cpp](https://github.com/ggml-org/whisper.cpp) with the `large-v3-turbo` model. Nothing leaves your machine.
+*   **GPU**: On NVIDIA it uses the GPU through `ggml-vulkan`, so the CPU stays almost idle. Without the plugin it runs on the CPU, which is slow.
+*   **Light**: Nothing runs until you press the key. The model is loaded only while the pill is open.
+*   **Cleanup**: Repeated words and "um" or "uh" are removed, and a lone "i" becomes "I".
+*   **How**: The microphone is read with `parec` and text is typed with `wtype`.
+*   **Vocabulary**: A word list helps it spell names and tools like Niri and Quickshell, and a second list fixes common mis-hearings. Add your own words to `~/.config/voice-dictation/vocabulary.txt`, and fixes as `wrong => right` lines to `~/.config/voice-dictation/replacements.txt`. The shared lists are in [scripts/](scripts/).
+
+The model is about 550 MB and is saved to `~/.local/share/whisper-cpp/`. Settings are at the top of [scripts/voice_dictation.py](scripts/voice_dictation.py).
 
 ---
 
@@ -148,10 +191,10 @@ graph TD
 
 ```bash
 # Clone the repo
-git clone https://github.com/insaneodyssey26/hyprland.git ~/hyprland
+git clone https://github.com/insaneodyssey26/dotfiles.git ~/dotfiles
 
 # Run setup
-cd ~/hyprland
+cd ~/dotfiles
 chmod +x setup.sh
 ./setup.sh
 ```
