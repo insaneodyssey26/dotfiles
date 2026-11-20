@@ -12,6 +12,9 @@ Singleton {
     property string activeWindowTitle: ""
     property string activeAppId: ""
     property var windowsList: []
+    property var keyboardLayouts: []
+    property int keyboardLayoutIndex: 0
+    readonly property string keyboardLayoutName: keyboardLayouts[keyboardLayoutIndex] || ""
 
     // Read initial workspaces
     Process {
@@ -79,15 +82,6 @@ Singleton {
         focusedWindowProc.running = true;
     }
 
-    Timer {
-        interval: 10000
-        running: true
-        repeat: true
-        onTriggered: {
-            niri.refreshFocus();
-        }
-    }
-
     // Stream live events from Niri
     Process {
         id: eventStream
@@ -127,6 +121,23 @@ Singleton {
                         } else {
                             niri.refreshFocus();
                         }
+                    } else if (ev.WindowOpenedOrChanged) {
+                        let changed = ev.WindowOpenedOrChanged.window;
+                        let known = niri.windowsList.filter(w => w.id !== changed.id);
+                        known.push(changed);
+                        niri.windowsList = known;
+                        if (changed.is_focused) {
+                            niri.activeWindowTitle = changed.title || "";
+                            niri.activeAppId = changed.app_id || "";
+                        }
+                    } else if (ev.WindowClosed) {
+                        niri.windowsList = niri.windowsList.filter(w => w.id !== ev.WindowClosed.id);
+                    } else if (ev.KeyboardLayoutsChanged) {
+                        let layouts = ev.KeyboardLayoutsChanged.keyboard_layouts;
+                        niri.keyboardLayouts = layouts.names || [];
+                        niri.keyboardLayoutIndex = layouts.current_idx || 0;
+                    } else if (ev.KeyboardLayoutSwitched) {
+                        niri.keyboardLayoutIndex = ev.KeyboardLayoutSwitched.idx || 0;
                     } else if (ev.WindowFocusChanged) {
                         let winId = ev.WindowFocusChanged.id;
                         if (!winId) {
@@ -137,8 +148,9 @@ Singleton {
                             if (win) {
                                 niri.activeWindowTitle = win.title || "";
                                 niri.activeAppId = win.app_id || "";
+                            } else {
+                                niri.refreshFocus();
                             }
-                            niri.refreshFocus();
                         }
                     }
                 } catch (e) {}

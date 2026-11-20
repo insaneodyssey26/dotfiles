@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import "../theme"
+import "../services"
 
 Rectangle {
     id: root
@@ -15,31 +16,13 @@ Rectangle {
 
     property string layoutCode: "US"
 
-    Process {
-        id: layoutQueryProc
-        command: ["niri", "msg", "--json", "keyboard-layouts"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    let data = JSON.parse(text)
-                    if (data && data.names && data.names.length > 0) {
-                        let name = data.names[data.current_idx || 0] || "English (US)"
-                        if (name.includes("US")) root.layoutCode = "US"
-                        else if (name.includes("IN")) root.layoutCode = "IN"
-                        else if (name.includes("Bengali") || name.includes("Bangla")) root.layoutCode = "BN"
-                        else root.layoutCode = name.substring(0, 2).toUpperCase()
-                    }
-                } catch (e) {}
-            }
-        }
-    }
+    readonly property string layoutName: Niri.keyboardLayoutName
 
-    Timer {
-        interval: 3000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: layoutQueryProc.running = true
+    onLayoutNameChanged: {
+        if (layoutName.includes("US")) layoutCode = "US"
+        else if (layoutName.includes("IN")) layoutCode = "IN"
+        else if (layoutName.includes("Bengali") || layoutName.includes("Bangla")) layoutCode = "BN"
+        else if (layoutName.length >= 2) layoutCode = layoutName.substring(0, 2).toUpperCase()
     }
 
     Text {
@@ -69,7 +52,6 @@ Rectangle {
     Process {
         id: switchLayoutProc
         command: ["niri", "msg", "action", "switch-layout", "next"]
-        onExited: layoutQueryProc.running = true
     }
 
     Process {

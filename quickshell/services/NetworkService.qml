@@ -15,11 +15,30 @@ QtObject {
     property real lastTime: 0
 
     property Timer pollTimer: Timer {
-        interval: 10000
+        interval: 60000
         running: true
         repeat: true
         triggeredOnStart: true
         onTriggered: wifiCheckProcess.running = true
+    }
+
+    property Timer settleTimer: Timer {
+        interval: 600
+        onTriggered: wifiCheckProcess.running = true
+    }
+
+    property Timer reconnectTimer: Timer {
+        interval: 5000
+        onTriggered: networkMonitor.running = true
+    }
+
+    property Process networkMonitor: Process {
+        command: ["nmcli", "monitor"]
+        running: true
+        stdout: SplitParser {
+            onRead: data => netService.settleTimer.restart()
+        }
+        onExited: netService.reconnectTimer.start()
     }
 
     property Timer speedTimer: Timer {
